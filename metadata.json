@@ -1,0 +1,6 @@
+{
+  "name": "Next.js App Router Platform",
+  "description": "A modern Next.js application built with App Router, server actions, interactive AI features, and responsive dashboard design.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
