@@ -53,7 +53,7 @@ export function convertHtmlToJsx(html: string): string {
 }
 
 /**
- * Generates complete Next.js 15 App Router Project Structure files
+ * Generates complete project structure files based on framework selection (Next.js or Vite)
  */
 export function generateNextjsProject(
   html: string,
@@ -63,7 +63,148 @@ export function generateNextjsProject(
 ): ProjectFile[] {
   const convertedJsx = convertHtmlToJsx(html);
   const compName = options.componentName || 'ConvertedWebsite';
+  const isVite = options.framework === 'vite';
 
+  if (isVite) {
+    // Vite + React + Tailwind + TypeScript Vercel-ready Project
+    const appTsx = `import React, { useEffect } from 'react';
+
+export default function App() {
+  useEffect(() => {
+    try {
+      ${js ? js : '// Interactive behaviors initialized'}
+    } catch (err) {
+      console.error('Script error:', err);
+    }
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-slate-900 text-slate-100 antialiased">
+      ${convertedJsx}
+    </div>
+  );
+}
+`;
+
+    const mainTsx = `import React, { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
+import './index.css';
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+`;
+
+    const indexCss = `@import "tailwindcss";
+
+/* Extracted custom CSS styles */
+${css}
+`;
+
+    const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${compName} - Vite React App</title>
+  </head>
+  <body class="bg-slate-900 text-slate-100">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+`;
+
+    const viteConfig = `import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  server: {
+    port: 3000,
+  },
+  build: {
+    outDir: 'dist',
+  }
+});
+`;
+
+    const packageJson = JSON.stringify(
+      {
+        name: 'my-vite-react-app',
+        private: true,
+        version: '1.0.0',
+        type: 'module',
+        scripts: {
+          dev: 'vite',
+          build: 'tsc && vite build',
+          lint: 'eslint .',
+          preview: 'vite preview'
+        },
+        dependencies: {
+          react: '^19.0.0',
+          'react-dom': '^19.0.0',
+          'lucide-react': '^0.470.0',
+          motion: '^12.0.0'
+        },
+        devDependencies: {
+          '@tailwindcss/vite': '^4.0.0',
+          '@types/react': '^19.0.0',
+          '@types/react-dom': '^19.0.0',
+          '@vitejs/plugin-react': '^4.3.0',
+          tailwindcss: '^4.0.0',
+          typescript: '^5.7.0',
+          vite: '^6.0.0'
+        }
+      },
+      null,
+      2
+    );
+
+    const vercelJson = JSON.stringify(
+      {
+        version: 2,
+        buildCommand: 'npm run build',
+        outputDirectory: 'dist',
+        framework: 'vite',
+        rewrites: [{ source: '/(.*)', destination: '/index.html' }]
+      },
+      null,
+      2
+    );
+
+    const readme = `# Vite + React + Tailwind Vercel Project
+
+Ushbu Vite loyihasi HTML/CSS/JS kodidan avtomatik o'tkazildi va Vercel platformasiga 1-klikda deploy qilishga tayyor.
+
+## 🚀 Vercel-ga deploy qilish:
+
+\`\`\`bash
+npm i -g vercel
+vercel
+\`\`\`
+
+Build katalogi: \`dist\`
+`;
+
+    return [
+      { path: 'src/App.tsx', name: 'App.tsx', content: appTsx, language: 'typescript' },
+      { path: 'src/main.tsx', name: 'main.tsx', content: mainTsx, language: 'typescript' },
+      { path: 'src/index.css', name: 'index.css', content: indexCss, language: 'css' },
+      { path: 'index.html', name: 'index.html', content: indexHtml, language: 'html' },
+      { path: 'vite.config.ts', name: 'vite.config.ts', content: viteConfig, language: 'typescript' },
+      { path: 'package.json', name: 'package.json', content: packageJson, language: 'json' },
+      { path: 'vercel.json', name: 'vercel.json', content: vercelJson, language: 'json' },
+      { path: 'README.md', name: 'README.md', content: readme, language: 'markdown' }
+    ];
+  }
+
+  // Otherwise, Next.js 15 App Router Project
   // 1. app/components/ConvertedWebsite.tsx
   const componentContent = `'use client';
 
@@ -175,10 +316,9 @@ const nextConfig = {
 export default nextConfig;
 `;
 
-  // 7. Dockerfile (For Cloud Run / Container deployment)
+  // 7. Dockerfile
   const dockerfile = `FROM node:20-alpine AS base
 
-# Install dependencies only when needed
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
@@ -186,7 +326,6 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
 
-# Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -195,7 +334,6 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 RUN npm run build
 
-# Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
 
@@ -247,9 +385,6 @@ vercel
 docker build -t my-next-app .
 docker run -p 3000:3000 my-next-app
 \`\`\`
-
-### 3. Netlify orqali:
-GitHub reponi ulaysiz va build buyrug'i: \`npm run build\`
 `;
 
   return [

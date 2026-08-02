@@ -34,6 +34,7 @@ export const HtmlConverterTool: React.FC<HtmlConverterToolProps> = ({
   const [copiedFile, setCopiedFile] = useState<boolean>(false);
 
   const [options, setOptions] = useState<ConversionOptions>({
+    framework: 'nextjs',
     useTailwind: true,
     useTypescript: true,
     componentName: 'ConvertedWebsite',
@@ -190,8 +191,33 @@ export const HtmlConverterTool: React.FC<HtmlConverterToolProps> = ({
           {/* Settings Bar */}
           <div className="bg-slate-950 px-4 py-3 border-t border-slate-800 flex flex-wrap items-center gap-4 text-xs text-slate-300">
             <span className="font-semibold text-slate-400 flex items-center gap-1">
-              <Settings className="w-3.5 h-3.5" /> Sozlamalar:
+              <Settings className="w-3.5 h-3.5" /> Platforma:
             </span>
+
+            {/* Framework Switcher */}
+            <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
+              <button
+                onClick={() => handleOptionChange('framework', 'nextjs')}
+                className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all ${
+                  options.framework === 'nextjs'
+                    ? 'bg-cyan-500 text-slate-950 shadow'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                🚀 Next.js 15
+              </button>
+              <button
+                onClick={() => handleOptionChange('framework', 'vite')}
+                className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all ${
+                  options.framework === 'vite'
+                    ? 'bg-purple-500 text-white shadow'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                ⚡ Vite + React
+              </button>
+            </div>
+
             <label className="flex items-center gap-1.5 cursor-pointer">
               <input
                 type="checkbox"
@@ -199,7 +225,7 @@ export const HtmlConverterTool: React.FC<HtmlConverterToolProps> = ({
                 onChange={(e) => handleOptionChange('useTailwind', e.target.checked)}
                 className="rounded accent-cyan-500"
               />
-              <span>Tailwind CSS v4</span>
+              <span>Tailwind v4</span>
             </label>
             <label className="flex items-center gap-1.5 cursor-pointer">
               <input
@@ -208,16 +234,7 @@ export const HtmlConverterTool: React.FC<HtmlConverterToolProps> = ({
                 onChange={(e) => handleOptionChange('useTypescript', e.target.checked)}
                 className="rounded accent-cyan-500"
               />
-              <span>TypeScript (.tsx)</span>
-            </label>
-            <label className="flex items-center gap-1.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={options.addFramerMotion}
-                onChange={(e) => handleOptionChange('addFramerMotion', e.target.checked)}
-                className="rounded accent-cyan-500"
-              />
-              <span>Framer Motion Animatsiya</span>
+              <span>TypeScript</span>
             </label>
           </div>
 

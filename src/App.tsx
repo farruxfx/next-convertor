@@ -3,6 +3,7 @@ import JSZip from 'jszip';
 import { Header } from './components/Header';
 import { HtmlConverterTool } from './components/HtmlConverterTool';
 import { NextjsProjectPreview } from './components/NextjsProjectPreview';
+import { Dashboard } from './components/Dashboard';
 import { DeploymentGuide } from './components/DeploymentGuide';
 import { GeminiRefiner } from './components/GeminiRefiner';
 import { SAMPLE_TEMPLATES } from './utils/samples';
@@ -11,7 +12,8 @@ import { ProjectFile } from './types';
 import { CheckCircle2, Sparkles, FolderDown, Terminal, Layers } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'converter' | 'preview' | 'guide' | 'ai'>('converter');
+  const [activeTab, setActiveTab] = useState<'converter' | 'preview' | 'dashboard' | 'guide' | 'ai'>('converter');
+  const [framework, setFramework] = useState<'nextjs' | 'vite'>('nextjs');
   
   // Default to initial template
   const initialSample = SAMPLE_TEMPLATES[0];
@@ -25,6 +27,7 @@ export default function App() {
   // Initialize generated project files on mount
   useEffect(() => {
     const generated = generateNextjsProject(html, css, js, {
+      framework,
       useTailwind: true,
       useTypescript: true,
       componentName: 'ConvertedWebsite',
@@ -42,6 +45,7 @@ export default function App() {
       setJs(found.js);
 
       const generated = generateNextjsProject(found.html, found.css, found.js, {
+        framework,
         useTailwind: true,
         useTypescript: true,
         componentName: 'ConvertedWebsite',
@@ -64,7 +68,7 @@ export default function App() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'nextjs-app-router-project.zip';
+      link.download = `${framework === 'vite' ? 'vite-react' : 'nextjs-app-router'}-project.zip`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -91,7 +95,7 @@ export default function App() {
       {downloadSuccess && (
         <div className="bg-emerald-500 text-slate-950 px-4 py-2 text-center text-xs font-bold flex items-center justify-center gap-2 shadow-lg animate-bounce">
           <CheckCircle2 className="w-4 h-4" />
-          <span>Next.js loyiha fayllari ZIP formatida muvaffaqiyatli yuklab olindi! (Deploy qilishga tayyor)</span>
+          <span>Loyiha fayllari ({framework.toUpperCase()}) ZIP formatida muvaffaqiyatli yuklab olindi! (Vercel deploy uchun tayyor)</span>
         </div>
       )}
 
@@ -121,6 +125,16 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'dashboard' && (
+          <Dashboard
+            files={files}
+            framework={framework}
+            html={html}
+            css={css}
+            js={js}
+          />
+        )}
+
         {activeTab === 'guide' && (
           <DeploymentGuide />
         )}
@@ -135,6 +149,7 @@ export default function App() {
               setCss(newCss);
               setJs(newJs);
               const generated = generateNextjsProject(newHtml, newCss, newJs, {
+                framework,
                 useTailwind: true,
                 useTypescript: true,
                 componentName: 'ConvertedWebsite',
@@ -153,11 +168,14 @@ export default function App() {
       <footer className="border-t border-slate-900 bg-slate-950 px-4 py-6 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="flex items-center gap-1.5">
-            <span>Next.js App Router v15 & React 19 Bilan Tayyorlangan</span>
+            <span>Next.js 15 & Vite React Bilan Tayyorlangan Vercel Converter Engine</span>
           </p>
           <div className="flex items-center gap-4 text-slate-400">
             <button onClick={() => setActiveTab('converter')} className="hover:text-cyan-400 transition-colors">
-              HTML2Next
+              O'tkazgich Engine
+            </button>
+            <button onClick={() => setActiveTab('dashboard')} className="hover:text-cyan-400 transition-colors">
+              Dashbord
             </button>
             <button onClick={() => setActiveTab('guide')} className="hover:text-cyan-400 transition-colors">
               Deploying Guide

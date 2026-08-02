@@ -6,6 +6,7 @@ export interface ProjectFile {
 }
 
 export interface ConversionOptions {
+  framework: 'nextjs' | 'vite';
   useTailwind: boolean;
   useTypescript: boolean;
   componentName: string;
@@ -33,3 +34,18 @@ export interface DeploymentPlatform {
   configFile?: string;
   configContent?: string;
 }
+
+export interface FileTypeStat {
+  name: string;
+  count: number;
+  lines: number;
+  bytes: number;
+  color: string;
+}
+
+export interface FileSizeStat {
+  name: string;
+  lines: number;
+  bytes: number;
+}
+
