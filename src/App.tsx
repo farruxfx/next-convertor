@@ -13,7 +13,7 @@ import { CheckCircle2, Sparkles, FolderDown, Terminal, Layers } from 'lucide-rea
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'converter' | 'preview' | 'dashboard' | 'guide' | 'ai'>('converter');
-  const [framework, setFramework] = useState<'nextjs' | 'vite'>('nextjs');
+  const [framework, setFramework] = useState<'nextjs' | 'vite'>('vite');
   
   // Default to initial template
   const initialSample = SAMPLE_TEMPLATES[0];
@@ -24,7 +24,7 @@ export default function App() {
   const [files, setFiles] = useState<ProjectFile[]>([]);
   const [downloadSuccess, setDownloadSuccess] = useState<boolean>(false);
 
-  // Initialize generated project files on mount
+  // Initialize and update generated project files whenever html/css/js/framework changes
   useEffect(() => {
     const generated = generateNextjsProject(html, css, js, {
       framework,
@@ -35,7 +35,7 @@ export default function App() {
       addLucideIcons: true,
     });
     setFiles(generated);
-  }, []);
+  }, [html, css, js, framework]);
 
   const handleSelectSample = (id: string) => {
     const found = SAMPLE_TEMPLATES.find(s => s.id === id);

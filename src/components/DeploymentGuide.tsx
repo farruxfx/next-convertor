@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Rocket, Terminal, Cloud, Github, CheckCircle2, Copy, Check, ExternalLink, HelpCircle } from 'lucide-react';
+import { Rocket, Terminal, Cloud, Github, CheckCircle2, Copy, Check, ExternalLink, HelpCircle, AlertTriangle } from 'lucide-react';
 
 export const DeploymentGuide: React.FC = () => {
   const [selectedPlatform, setSelectedPlatform] = useState<'vercel' | 'cloudrun' | 'netlify' | 'github'>('vercel');
@@ -99,7 +99,7 @@ export const DeploymentGuide: React.FC = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-cyan-400" /> Vercel orqali Next.js deploy qilish
+                <CheckCircle2 className="w-5 h-5 text-cyan-400" /> Vercel orqali Vite React & Next.js deploy qilish
               </h3>
               <a
                 href="https://vercel.com/new"
@@ -111,14 +111,29 @@ export const DeploymentGuide: React.FC = () => {
               </a>
             </div>
 
+            {/* Error Fix Alert Card */}
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 space-y-2">
+              <div className="flex items-center gap-2 text-amber-300 font-bold text-xs">
+                <AlertTriangle className="w-4 h-4 text-amber-400" />
+                <span>"Error: The Next.js output directory '.next' was not found" Xatosini Tuzatish:</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Vercel sukut bo'yicha loyihani <strong className="text-white">Next.js</strong> deb taxmin qilgan bo'lsa, u <code className="text-amber-300">.next</code> katalogini qidiradi va deploy to'xtaydi.
+              </p>
+              <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs text-slate-300 space-y-1">
+                <div><strong>Yechim 1:</strong> Vercel Dashboard {`>`} Project Settings {`>`} <strong>Framework Preset</strong> bo'limida <strong>"Vite"</strong> ni tanlang va Output Directory ni <strong><code className="text-cyan-400">dist</code></strong> ga sozlang.</div>
+                <div><strong>Yechim 2:</strong> Biz generatsiya qilgan <code className="text-emerald-400">vercel.json</code> fayli loyiha ildizida bor. Unda <code className="text-purple-300 font-mono">"framework": "vite"</code> sozlangan bo'lib, xatoni avtomatik bartaraf etadi!</div>
+              </div>
+            </div>
+
             <div className="space-y-4 text-sm text-slate-300">
               <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                <span className="text-xs font-bold text-slate-400 block mb-2">1-Usul: Terminal CLI orqali (Tavsiya etiladi)</span>
-                <p className="text-xs text-slate-400 mb-3">Loyihangiz papkasida terminalni oching va quyidagi buyruqlarni ketma-ket bajaring:</p>
+                <span className="text-xs font-bold text-slate-400 block mb-2">1-Usul: Terminal CLI (Vite & Next.js loyihalar uchun)</span>
+                <p className="text-xs text-slate-400 mb-3">Loyihangiz papkasida terminalni oching va quyidagi buyruqni bajaring:</p>
                 <div className="relative bg-slate-900 p-3 rounded-lg font-mono text-xs text-emerald-400 flex items-center justify-between border border-slate-800">
-                  <code>npm install -g vercel && vercel</code>
+                  <code>npm install -g vercel && vercel --prod</code>
                   <button
-                    onClick={() => copyToClipboard('npm install -g vercel && vercel', 'v1')}
+                    onClick={() => copyToClipboard('npm install -g vercel && vercel --prod', 'v1')}
                     className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300"
                   >
                     {copiedCmd === 'v1' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
@@ -127,11 +142,11 @@ export const DeploymentGuide: React.FC = () => {
               </div>
 
               <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                <span className="text-xs font-bold text-slate-400 block mb-2">2-Usul: GitHub orqali Avtomatik Deploy</span>
+                <span className="text-xs font-bold text-slate-400 block mb-2">2-Usul: GitHub orqali Vercel Deploy</span>
                 <ol className="list-decimal list-inside text-xs text-slate-300 space-y-2 leading-relaxed">
-                  <li>Yuklab olingan Next.js loyiha fayllarini o'zingizning GitHub repozitoriyangizga push qiling.</li>
-                  <li><strong className="text-white">Vercel.com</strong> saytiga kiring va "Add New Project" tugmasini bosing.</li>
-                  <li>GitHub repozitoriyangizni tanlang. Vercel avtomatik tarzda Next.js sozlamalarini aniqlaydi va 1-klikda Deploy qiladi!</li>
+                  <li>Yuklab olingan ZIP ichidagi fayllarni o'zingizning GitHub repozitoriyangizga joylang.</li>
+                  <li><strong className="text-white">Vercel.com</strong>-ga kiring va "Add New Project" ni bosing.</li>
+                  <li>Vite ishlatayotgan bo'lsangiz, Framework Preset: <span className="text-cyan-400 font-bold">Vite</span>, Build Command: <code className="text-emerald-400">npm run build</code>, Output Directory: <code className="text-emerald-400">dist</code> bo'lishiga ishonch hosil qiling.</li>
                 </ol>
               </div>
             </div>
